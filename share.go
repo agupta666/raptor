@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func share(host string, port int) {
+func share(host string, port int, token string) {
 	addr := fmt.Sprintf("%s:%d", host, port)
 	conn, err := net.Dial("tcp", addr)
 
@@ -19,7 +19,6 @@ func share(host string, port int) {
 		return
 	}
 
-	token := generateToken()
 	fmt.Println("Token:", token)
 	fmt.Fprintln(conn, token)
 

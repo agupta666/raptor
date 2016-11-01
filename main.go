@@ -11,8 +11,14 @@ func cmdShare(c *cli.Context) error {
 	host := c.String("b")
 	sp := c.Int("sp")
 	jp := c.Int("jp")
+	token := c.String("t")
+
+	if len(token) == 0 {
+		token = generateToken()
+	}
+
 	serve(host, sp, jp)
-	share(host, sp)
+	share(host, sp, token)
 	return nil
 }
 
@@ -45,6 +51,7 @@ func main() {
 				cli.StringFlag{Name: "b", Value: "0.0.0.0", Usage: "bind address for listeners"},
 				cli.IntFlag{Name: "sp", Value: 8080, Usage: "listen on port for sharing requests"},
 				cli.IntFlag{Name: "jp", Value: 8081, Usage: "listen on port for joining requests"},
+				cli.StringFlag{Name: "t", Value: "", Usage: "set session token"},
 			},
 		},
 		{
