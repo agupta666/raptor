@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func join(host string, port int) {
+func join(host string, port int, token string) {
 
 	addr := fmt.Sprintf("%s:%d", host, port)
 	conn, err := net.Dial("tcp", addr)
@@ -17,6 +17,8 @@ func join(host string, port int) {
 		fmt.Println("ERROR:", err)
 		return
 	}
+
+	fmt.Fprintln(conn, token)
 
 	termState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
 

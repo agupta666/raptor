@@ -19,6 +19,10 @@ func share(host string, port int) {
 		return
 	}
 
+	token := generateToken()
+	fmt.Println("Token:", token)
+	fmt.Fprintln(conn, token)
+
 	w, h, err := terminal.GetSize(int(os.Stdin.Fd()))
 
 	if err != nil {

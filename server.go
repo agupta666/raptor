@@ -41,10 +41,15 @@ func startListener(addr string, h ConnHandler) chan bool {
 	ready := make(chan bool, 1)
 	go func() {
 		ln, err := net.Listen("tcp", addr)
+
 		if err != nil {
 			fmt.Println("ERROR:", err)
+			ready <- true
+			return
 		}
+
 		ready <- true
+
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
@@ -52,24 +57,45 @@ func startListener(addr string, h ConnHandler) chan bool {
 			}
 			go h(conn)
 		}
+
 	}()
 
 	return ready
 }
 
 func serve(host string, sharePort int, joinPort int) {
-	sharePipe := NewPipe()
-	joinPipe := NewPipe()
+	// sharePipe := NewPipe()
+	// joinPipe := NewPipe()
 
 	shareAddr := fmt.Sprintf("%s:%d", host, sharePort)
 	joinAddr := fmt.Sprintf("%s:%d", host, joinPort)
 
 	<-startListener(shareAddr, func(conn net.Conn) {
-		<-connect(joinPipe, sharePipe, conn)
+		token, err := readToken(conn)
+
+		if err != nil {
+			return
+		}
+
+		session := NewSession(conn)
+		saveSession(token, session)
+		<-connect(session.JoinPipe, session.SharePipe, conn)
 	})
 
 	<-startListener(joinAddr, func(conn net.Conn) {
-		<-connect(sharePipe, joinPipe, conn)
+		token, err := readToken(conn)
+
+		if err != nil {
+			return
+		}
+
+		session, err := lookup(token)
+
+		if err != nil {
+			conn.Close()
+			return
+		}
+		<-connect(session.SharePipe, session.JoinPipe, conn)
 	})
 
 }

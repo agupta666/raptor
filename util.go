@@ -1,11 +1,21 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net"
 	"os"
 )
+
+func readToken(conn net.Conn) (string, error) {
+	r := bufio.NewReader(conn)
+	token, err := r.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+	return string(token), nil
+}
 
 func connectStreams(conn net.Conn, in io.Reader, out io.Writer) chan bool {
 	finish := make(chan bool, 1)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/urfave/cli"
@@ -18,7 +19,14 @@ func cmdShare(c *cli.Context) error {
 func cmdJoin(c *cli.Context) error {
 	host := c.String("s")
 	port := c.Int("p")
-	join(host, port)
+	token := c.String("t")
+
+	if len(token) == 0 {
+		fmt.Println("ERROR:", "session token is required")
+		return nil
+	}
+
+	join(host, port, token)
 	return nil
 }
 
@@ -47,6 +55,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "s", Value: "0.0.0.0", Usage: "address to connect to"},
 				cli.IntFlag{Name: "p", Value: 8081, Usage: "port to connect to"},
+				cli.StringFlag{Name: "t", Value: "", Usage: "session token"},
 			},
 		},
 	}
