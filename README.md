@@ -28,7 +28,7 @@ bash-3.2$
 to set your own token while sharing a session use the -t flag
 
 ```
-raptor share -t 1011
+$ raptor share -t 1011
 Token: 1011
 bash-3.2$
 ```
